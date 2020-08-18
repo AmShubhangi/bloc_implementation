@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fvbank/src/commonFunc.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/src/loginBloc.dart';
 import 'package:fvbank/src/loginState.dart';
@@ -14,10 +15,10 @@ import 'component/transactionItem.component.dart';
 class DashboardPage extends StatefulWidget {
   final String token;
 
-  DashboardPage(
-      {Key key,
-        @required this.token,})
-      : super(key: key);
+  DashboardPage({
+    Key key,
+    @required this.token,
+  }) : super(key: key);
 
   @override
   _DashboardState createState() => _DashboardState();
@@ -26,11 +27,14 @@ class DashboardPage extends StatefulWidget {
 class _DashboardState extends State<DashboardPage> {
   bool isLoading = false;
   UserRepository userRepository;
+  var transTitle = "";
+  TransactionSection transactionSection;
 
   @override
   void initState() {
     super.initState();
     this.userRepository = new UserRepository();
+    this.transactionSection = new TransactionSection();
   }
 
   handleAPIError(dynamic res) {
@@ -170,19 +174,21 @@ class _DashboardState extends State<DashboardPage> {
         });
   }
 
-  Future<String> _getName(context, int index, dynamic data, String sessionToken) async {
-    print("darttttta=>$data");
+  Future<String> _getName(
+      context, int index, dynamic data, String sessionToken) async {
     var resTransactionDetails = await userRepository.getTransactionDetail(
         sessionToken: widget.token,
         transactionNumber: data[index]['transactionNumber']);
-    print("resTransactionDetails=>$resTransactionDetails");
+    String companyName = '';
+    String firstName = '';
+    String lastName = '';
     String transactionTitle = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
+      print("If");
+//      transactionSection.TransactionName("to", resTransactionDetails,
+//          resTransactionDetails['to']['type']['name']);
       transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
-        String companyName = '';
-        String firstName = '';
-        String lastName = '';
         if (resTransactionDetails.containsKey('transaction')) {
           var transactionData = resTransactionDetails['transaction'];
           if (transactionData.containsKey('customValues')) {
@@ -202,7 +208,6 @@ class _DashboardState extends State<DashboardPage> {
             }
           }
         }
-
         if (companyName != '') {
           transactionTitle = companyName;
         } else if (firstName != '' || lastName != '') {
@@ -212,7 +217,9 @@ class _DashboardState extends State<DashboardPage> {
         }
       } else if (resTransactionDetails['kind'] == 'transferFee') {}
     } else {
-      transactionTitle = resTransactionDetails['from']['type']['name'];
+      print("else");
+//      transactionSection.TransactionName("from", resTransactionDetails,
+//          resTransactionDetails['from']['type']['name']);
 
       String senderName;
       String companyName = '';
@@ -276,7 +283,7 @@ class _DashboardState extends State<DashboardPage> {
                           dateTime: formattedDate,
                           amount: historyListData[index]['amount'],
                           transactionId: historyListData[index]
-                          ['transactionNumber'],
+                              ['transactionNumber'],
                           description: historyListData[index]['description'],
                           imagePath: 'images/icon_bank.png',
                         );
@@ -293,10 +300,10 @@ class _DashboardState extends State<DashboardPage> {
               );
             },
             separatorBuilder: (BuildContext context, int index) => Divider(
-              height: 1,
-              thickness: 1,
-              color: Colors.grey,
-            )),
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey,
+                )),
       );
     } else {
       return Container(
@@ -314,22 +321,21 @@ class _DashboardState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     Widget loadingIndicator = isLoading
         ? new Container(
-      color: Colors.black.withOpacity(0.3),
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      child: new Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: new Center(child: new CircularProgressIndicator())),
-    )
-        : new Container();
+            color: Colors.black.withOpacity(0.3),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: new Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: new Center(child: new CircularProgressIndicator())),
+          )
+        : new Container(width: 0.0, height: 0.0);
     return MaterialApp(
       home: Scaffold(
           backgroundColor: CommonTheme.COLOR_PRIMARY,
           body: Scaffold(
             backgroundColor: CommonTheme.COLOR_PRIMARY,
             body: Container(child: BlocBuilder<LoginBloc, LoginState>(
-              // ignore: missing_return
-              builder: (BuildContext context, LoginState state) {
+              builder: (context, state) {
                 if (state is LoginSuccess) {
                   return Stack(
                     children: <Widget>[
@@ -371,11 +377,11 @@ class _DashboardState extends State<DashboardPage> {
                                       state.accInfo['currency']['symbol'] +
                                           ' ' +
                                           state.accInfo['status']
-                                          ['availableBalance'],
+                                              ['availableBalance'],
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize:
-                                          CommonTheme.TEXT_SIZE_EXTRA_LARGE,
+                                              CommonTheme.TEXT_SIZE_EXTRA_LARGE,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -383,7 +389,8 @@ class _DashboardState extends State<DashboardPage> {
                               ),
                             ),
                             Expanded(
-                              child: _listItem(state.accHistoryData, widget.token),
+                              child:
+                                  _listItem(state.accHistoryData, widget.token),
                             ),
                           ],
                         ),
@@ -397,6 +404,7 @@ class _DashboardState extends State<DashboardPage> {
                 } else if (state is LoginFailure) {
                   return CircularProgressIndicator();
                 }
+                return CircularProgressIndicator();
               },
             )),
           )),
