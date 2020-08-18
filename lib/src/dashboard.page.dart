@@ -13,16 +13,10 @@ import 'component/transactionItem.component.dart';
 
 class DashboardPage extends StatefulWidget {
   final String token;
-  final dynamic accInfo;
-  final dynamic userInfo;
-  final dynamic accHistory;
 
   DashboardPage(
       {Key key,
-      @required this.token,
-      @required this.accInfo,
-      @required this.userInfo,
-      @required this.accHistory})
+        @required this.token,})
       : super(key: key);
 
   @override
@@ -176,12 +170,12 @@ class _DashboardState extends State<DashboardPage> {
         });
   }
 
-  Future<String> _getName(
-      context, int index, dynamic data, String sessionToken) async {
+  Future<String> _getName(context, int index, dynamic data, String sessionToken) async {
+    print("darttttta=>$data");
     var resTransactionDetails = await userRepository.getTransactionDetail(
         sessionToken: widget.token,
         transactionNumber: data[index]['transactionNumber']);
-
+    print("resTransactionDetails=>$resTransactionDetails");
     String transactionTitle = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
       transactionTitle = resTransactionDetails['to']['type']['name'];
@@ -260,8 +254,8 @@ class _DashboardState extends State<DashboardPage> {
     return transactionTitle;
   }
 
-  dynamic _listItem(dynamic historyListData, String sessionToken) {
-    if (historyListData.length > 0) {
+  dynamic _listItem(List<dynamic> historyListData, String sessionToken) {
+    if (historyListData.length > 0 || historyListData != null) {
       return Container(
         child: ListView.separated(
             shrinkWrap: true,
@@ -282,7 +276,7 @@ class _DashboardState extends State<DashboardPage> {
                           dateTime: formattedDate,
                           amount: historyListData[index]['amount'],
                           transactionId: historyListData[index]
-                              ['transactionNumber'],
+                          ['transactionNumber'],
                           description: historyListData[index]['description'],
                           imagePath: 'images/icon_bank.png',
                         );
@@ -299,10 +293,10 @@ class _DashboardState extends State<DashboardPage> {
               );
             },
             separatorBuilder: (BuildContext context, int index) => Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                )),
+              height: 1,
+              thickness: 1,
+              color: Colors.grey,
+            )),
       );
     } else {
       return Container(
@@ -320,93 +314,92 @@ class _DashboardState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     Widget loadingIndicator = isLoading
         ? new Container(
-            color: Colors.black.withOpacity(0.3),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
+      color: Colors.black.withOpacity(0.3),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: new Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: new Center(child: new CircularProgressIndicator())),
+    )
         : new Container();
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: CommonTheme.COLOR_PRIMARY,
-        body:Scaffold(
           backgroundColor: CommonTheme.COLOR_PRIMARY,
-          body: Container(child: BlocBuilder<LoginBloc, LoginState>(
-            // ignore: missing_return
-            builder: (BuildContext context, LoginState state) {
-              if (state is LoginSuccess) {
-                print("print(state.userInfor) =>   ${state.userInfor['display']}");
-                return Stack(
-                  children: <Widget>[
-                    SafeArea(
-                      bottom: false,
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  state.userInfor['display'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
+          body: Scaffold(
+            backgroundColor: CommonTheme.COLOR_PRIMARY,
+            body: Container(child: BlocBuilder<LoginBloc, LoginState>(
+              // ignore: missing_return
+              builder: (BuildContext context, LoginState state) {
+                if (state is LoginSuccess) {
+                  return Stack(
+                    children: <Widget>[
+                      SafeArea(
+                        bottom: false,
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    state.userInfor['display'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  state.userInfor['group']['name'] + ' Account',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 27),
-                                  child: Text(
-                                    'Current Balance',
+                                  Text(
+                                    state.userInfor['group']['name'] +
+                                        ' Account',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: CommonTheme.TEXT_SIZE_SMALL,
                                     ),
                                   ),
-                                ),
-//                                Padding(
-//                                  padding: const EdgeInsets.only(bottom: 16),
-//                                  child: Text(
-//                                    widget.accInfo['currency']['symbol'] +
-//                                        ' ' +
-//                                        widget.accInfo['status']
-//                                        ['availableBalance'],
-//                                    style: TextStyle(
-//                                        color: Colors.white,
-//                                        fontSize:
-//                                        CommonTheme.TEXT_SIZE_EXTRA_LARGE,
-//                                        fontWeight: FontWeight.bold),
-//                                  ),
-//                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 27),
+                                    child: Text(
+                                      'Current Balance',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 16),
+                                    child: Text(
+                                      state.accInfo['currency']['symbol'] +
+                                          ' ' +
+                                          state.accInfo['status']
+                                          ['availableBalance'],
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                          CommonTheme.TEXT_SIZE_EXTRA_LARGE,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-//                          Expanded(
-//                            child: _listItem(widget.accHistory, widget.token),
-//                          ),
-                        ],
+                            Expanded(
+                              child: _listItem(state.accHistoryData, widget.token),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    new Align(
-                      child: loadingIndicator,
-                      alignment: FractionalOffset.center,
-                    ),
-                  ],
-                );
-              }else if(state is LoginFailure) {
-                return CircularProgressIndicator();
-              }
-            },
+                      new Align(
+                        child: loadingIndicator,
+                        alignment: FractionalOffset.center,
+                      ),
+                    ],
+                  );
+                } else if (state is LoginFailure) {
+                  return CircularProgressIndicator();
+                }
+              },
+            )),
           )),
-        )
-      ),
     );
   }
 }

@@ -15,58 +15,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Map userData;
-  Map accountData;
-  List<dynamic> accHistoryData = [];
-
   @protected
   bool get hasScopedWillPopCallback {
     return false;
   }
-
-  UserRepository userRepository;
 
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    this.userRepository = new UserRepository();
-    fetchUserData();
-    fetchAccountDetail();
-  }
-
-  Future<dynamic> fetchUserData() async {
-    await userRepository
-        .getUserProfile(sessionToken: widget.token)
-        .then((value) {
-      setState(() {
-        userData = value;
-      });
-    });
-  }
-
-  Future<dynamic> fetchAccountDetail() async {
-    await userRepository
-        .getAccounts(sessionToken: widget.token)
-        .then((value) => {
-              setState(() {
-                accountData = value;
-              }),
-              fetchAccountHistoryDetail(
-                  widget.token, value['type']['internalName']),
-            });
-  }
-
-  Future<dynamic> fetchAccountHistoryDetail(sessionToken, accountType) async {
-    await userRepository
-        .getAccountsHistory(
-            sessionToken: widget.token, accountType: accountType)
-        .then((value) {
-      setState(() {
-        accHistoryData = value;
-      });
-    });
   }
 
   @override
@@ -75,9 +33,6 @@ class _HomePageState extends State<HomePage> {
       body: _currentIndex == 0
           ? DashboardPage(
               token: widget.token,
-              accInfo: accountData,
-              userInfo: userData != null ? userData : null,
-              accHistory: accHistoryData != null ? accHistoryData : null,
             )
           : MenuPage(),
       bottomNavigationBar: BottomNavyBar(
