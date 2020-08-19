@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:user_repository/user_repository.dart';
 
@@ -9,14 +10,9 @@ import 'authenticationState.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-//  final AuthenticationBloc authenticationBloc;
-////  AuthenticationBloc authenticationBloc = AuthenticationBloc();
-//
-//
-//  AuthenticationBloc({@required this.authenticationBloc})
-////      : assert(authenticationBloc != null), super(null);
-//      : super(null);
   final UserRepository userRepository;
+
+  var storage = FlutterSecureStorage();
 
   AuthenticationBloc({@required this.userRepository})
       : assert(userRepository != null),
@@ -34,6 +30,7 @@ class AuthenticationBloc
       yield AuthenticationInProgress();
 
       yield AuthenticationSuccess(token: event.token);
+      storage.write(key: "authToken", value: event.token);
     }
 
 //    if (event is AuthenticationLoggedOut) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:user_repository/user_repository.dart';
@@ -153,7 +154,7 @@ class _LoginFormState extends State<LoginForm> {
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
       builder: (context, state) {
         if (state is AuthenticationSuccess) {
-          return HomePage(token: state.token);
+          return HomePage();
         }
         return Stack(
           children: <Widget>[

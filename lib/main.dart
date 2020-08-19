@@ -33,9 +33,6 @@ class SimpleBlocObserver extends BlocObserver {
 
 void main() {
   Bloc.observer = SimpleBlocObserver();
-  final _initialState =
-      AppState(sessionToken: '', userProfileData: {}, accountsData: {});
-//  final Store<AppState> _store = Store(reducer, initialState: _initialState);
   final userRepository = UserRepository();
   runApp(
     BlocProvider<AuthenticationBloc>(
@@ -76,10 +73,11 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: (context, state) {
-//              return LoginPage(userRepository: userRepository);
-              return snapshot.data == 'true'
-                  ? OTPComponent(userRepository: userRepository)
-                  : LoginPage(userRepository: userRepository);
+              return LoginPage(userRepository: userRepository);
+//              return OTPComponent(userRepository: userRepository);
+//              return snapshot.data == 'true'
+//                  ? OTPComponent(userRepository: userRepository)
+//                  : LoginPage(userRepository: userRepository);
             },
           ),
         );

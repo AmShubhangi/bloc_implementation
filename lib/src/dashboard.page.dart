@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fvbank/src/commonFunc.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/src/loginBloc.dart';
@@ -13,13 +14,6 @@ import 'component/transactionDetail.component.dart';
 import 'component/transactionItem.component.dart';
 
 class DashboardPage extends StatefulWidget {
-  final String token;
-
-  DashboardPage({
-    Key key,
-    @required this.token,
-  }) : super(key: key);
-
   @override
   _DashboardState createState() => _DashboardState();
 }
@@ -27,6 +21,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardState extends State<DashboardPage> {
   bool isLoading = false;
   UserRepository userRepository;
+  var storage = FlutterSecureStorage();
   var transTitle = "";
   TransactionSection transactionSection;
 
@@ -50,11 +45,11 @@ class _DashboardState extends State<DashboardPage> {
     }
   }
 
-  _transactionItemPressed(
-      context, int index, dynamic data, String sessionToken) async {
+  _transactionItemPressed(context, int index, dynamic data) async {
     dynamic transactionNumber = data[index]['transactionNumber'];
     var resTransactionDetails = await userRepository.getTransactionDetail(
-        sessionToken: widget.token, transactionNumber: transactionNumber);
+        sessionToken: await storage.read(key: "authToken"),
+        transactionNumber: transactionNumber);
 
     String to = '';
     String from = '';
@@ -174,10 +169,9 @@ class _DashboardState extends State<DashboardPage> {
         });
   }
 
-  Future<String> _getName(
-      context, int index, dynamic data, String sessionToken) async {
+  Future<String> _getName(context, int index, dynamic data) async {
     var resTransactionDetails = await userRepository.getTransactionDetail(
-        sessionToken: widget.token,
+        sessionToken: await storage.read(key: "authToken"),
         transactionNumber: data[index]['transactionNumber']);
     String companyName = '';
     String firstName = '';
@@ -261,7 +255,7 @@ class _DashboardState extends State<DashboardPage> {
     return transactionTitle;
   }
 
-  dynamic _listItem(List<dynamic> historyListData, String sessionToken) {
+  dynamic _listItem(List<dynamic> historyListData) {
     if (historyListData.length > 0 || historyListData != null) {
       return Container(
         child: ListView.separated(
@@ -275,8 +269,7 @@ class _DashboardState extends State<DashboardPage> {
               return GestureDetector(
                 child: IntrinsicHeight(
                   child: FutureBuilder<String>(
-                      future: _getName(
-                          context, index, historyListData, sessionToken),
+                      future: _getName(context, index, historyListData),
                       builder: (context, snapshot) {
                         return TransactionItemComponent(
                           companyName: snapshot.hasData ? snapshot.data : '--',
@@ -294,8 +287,7 @@ class _DashboardState extends State<DashboardPage> {
                   setState(() {
                     isLoading = true;
                   });
-                  _transactionItemPressed(
-                      context, index, historyListData, sessionToken);
+                  _transactionItemPressed(context, index, historyListData);
                 },
               );
             },
@@ -394,8 +386,7 @@ class _DashboardState extends State<DashboardPage> {
                                 ),
                               ),
                               Expanded(
-                                child: _listItem(
-                                    state.accHistoryData, widget.token),
+                                child: _listItem(state.accHistoryData),
                               ),
                             ],
                           ),

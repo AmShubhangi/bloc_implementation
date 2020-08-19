@@ -3,13 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fvbank/src/dashboard.page.dart';
 import 'package:fvbank/src/menu.page.dart';
 import 'package:fvbank/themes/common.theme.dart';
-import 'package:user_repository/user_repository.dart';
 
 class HomePage extends StatefulWidget {
-  final String token;
-
-  HomePage({Key key, @required this.token}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -30,11 +25,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentIndex == 0
-          ? DashboardPage(
-              token: widget.token,
-            )
-          : MenuPage(),
+      body: _currentIndex == 0 ? DashboardPage() : MenuPage(),
       bottomNavigationBar: BottomNavyBar(
         selectedIndex: _currentIndex,
         backgroundColor: CommonTheme.COLOR_DARK,
