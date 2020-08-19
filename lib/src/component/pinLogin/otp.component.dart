@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fvbank/src/component/pinLogin/keyboard.component.dart';
 import 'package:fvbank/src/component/pinLogin/pinNumber.component.dart';
 import 'package:fvbank/src/home.page.dart';
-import 'package:fvbank/src/interfaces/api_interfaces.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
+import 'package:user_repository/user_repository.dart';
+
+import '../../loginBloc.dart';
+import '../../loginEvent.dart';
 
 List<String> currentPin = ['', '', '', '', '', ''];
 
@@ -25,6 +29,12 @@ final outlineInputBorder = OutlineInputBorder(
 int pinIndex = 0;
 
 class OTPComponent extends StatefulWidget {
+  final UserRepository userRepository;
+
+  OTPComponent({Key key, @required this.userRepository})
+      : assert(userRepository != null),
+        super(key: key);
+
   @override
   _OTPComponentState createState() => _OTPComponentState();
 }
@@ -37,75 +47,38 @@ class _OTPComponentState extends State<OTPComponent> {
       isLoading = false;
     });
     if (res['code'] == 'loggedOut') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-      return;
+//      Navigator.push(
+//        context,
+//        MaterialPageRoute(builder: (context) => LoginPage()),
+//      );
+//      return;
     }
   }
 
   void _signIn(context, String username, String password) async {
+    print('SIgnIn');
     setState(() {
       isLoading = true;
     });
-    var res = await APIInterfaces.loginUser(username, password);
-    print('RES:-$res');
-//    if (res.containsKey('code')) {
-//      handleAPIError(res);
-//    } else {
-    if (!res.containsKey('sessionToken')) {
-      setState(() {
-        isLoading = false;
-      });
-    }
+    print('SIgnIn loading indicator true');
 
-    var sessionToken = res['sessionToken'];
-    print('ST:-$sessionToken');
-//      Store SessionToken
+    BlocProvider.of<LoginBloc>(context).add(
+      LoginButtonPressed(
+        username: username,
+        password: password,
+      ),
+    );
+    print('SIgnIn BlocProvider');
+    setState(() {
+      isLoading = false;
+    });
+    print('SIgnIn  loading indicator False');
 
-    var resUserProfile = await APIInterfaces.getUserProfile(sessionToken);
-    print('RES USER:-$resUserProfile');
-
-    if (resUserProfile.containsKey('code')) {
-      handleAPIError(resUserProfile);
-    } else {
-      if (!resUserProfile.containsKey('display')) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-//        Store User data
-      var resGetAccounts = await APIInterfaces.getAccounts(sessionToken);
-//        if (resGetAccounts.containsKey('code')) {
-//          handleAPIError(resGetAccounts);
-//        } else {
-      var accountData = resGetAccounts[0];
-      var accountType = resGetAccounts[0]['type']['internalName'];
-      print('AccountType ==>> $accountType');
-      print('RES GET ACCOUNTS:-$accountData');
-      if (!accountData.containsKey('number')) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-//Store Account data
-      var resGetAccountsHistory =
-          await APIInterfaces.getAccountsHistory(sessionToken, accountType);
-//          if (resGetAccountsHistory.containsKey('code')) {
-//            handleAPIError(resGetAccountsHistory);
-//          } else {
-      print('RES GET ACCOUNTS HISTORY==>> $resGetAccountsHistory');
-//         Store Account history
-      clearAllPin();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-//          }
-//        }
-    }
-//    }
+    clearAllPin();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
   }
 
   pinIndexSetUp(context, String enteredPin) async {
@@ -129,9 +102,11 @@ class _OTPComponentState extends State<OTPComponent> {
           print('userName:-$username');
           print('password:-$password');
           if (username != '' && password != '') {
+            print('IF ==>>');
             clearAllPin();
             _signIn(context, username, password);
           } else {
+            print('Else ==>>');
             await SecurityUtil.removePINCodeSecurity();
             Navigator.push(
               context,

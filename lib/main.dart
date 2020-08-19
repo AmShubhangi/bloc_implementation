@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationBloc.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationEvent.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationState.dart';
+import 'package:fvbank/src/component/pinLogin/otp.component.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/src/modal/app_state.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
@@ -75,8 +76,10 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: (context, state) {
-              return LoginPage(userRepository: userRepository);
-//          home: snapshot.data == 'true' ? OTPComponent() : LoginPage(userRepository: userRepository),
+//              return LoginPage(userRepository: userRepository);
+              return snapshot.data == 'true'
+                  ? OTPComponent(userRepository: userRepository)
+                  : LoginPage(userRepository: userRepository);
             },
           ),
         );

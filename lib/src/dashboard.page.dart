@@ -325,8 +325,11 @@ class _DashboardState extends State<DashboardPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
+              padding: const EdgeInsets.all(5.0),
+              child: new Center(
+                child: new CircularProgressIndicator(),
+              ),
+            ),
           )
         : new Container(width: 0.0, height: 0.0);
     return MaterialApp(
@@ -334,79 +337,88 @@ class _DashboardState extends State<DashboardPage> {
           backgroundColor: CommonTheme.COLOR_PRIMARY,
           body: Scaffold(
             backgroundColor: CommonTheme.COLOR_PRIMARY,
-            body: Container(child: BlocBuilder<LoginBloc, LoginState>(
-              builder: (context, state) {
-                if (state is LoginSuccess) {
-                  return Stack(
-                    children: <Widget>[
-                      SafeArea(
-                        bottom: false,
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    state.userInfor['display'],
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
+            body: Container(
+              child: BlocBuilder<LoginBloc, LoginState>(
+                builder: (context, state) {
+                  if (state is LoginSuccess) {
+                    return Stack(
+                      children: <Widget>[
+                        SafeArea(
+                          bottom: false,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      state.userInfor['display'],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    state.userInfor['group']['name'] +
-                                        ' Account',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 27),
-                                    child: Text(
-                                      'Current Balance',
+                                    Text(
+                                      state.userInfor['group']['name'] +
+                                          ' Account',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: CommonTheme.TEXT_SIZE_SMALL,
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: Text(
-                                      state.accInfo['currency']['symbol'] +
-                                          ' ' +
-                                          state.accInfo['status']
-                                              ['availableBalance'],
-                                      style: TextStyle(
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 27),
+                                      child: Text(
+                                        'Current Balance',
+                                        style: TextStyle(
                                           color: Colors.white,
-                                          fontSize:
-                                              CommonTheme.TEXT_SIZE_EXTRA_LARGE,
-                                          fontWeight: FontWeight.bold),
+                                          fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16),
+                                      child: Text(
+                                        state.accInfo['currency']['symbol'] +
+                                            ' ' +
+                                            state.accInfo['status']
+                                                ['availableBalance'],
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: CommonTheme
+                                                .TEXT_SIZE_EXTRA_LARGE,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child:
-                                  _listItem(state.accHistoryData, widget.token),
-                            ),
-                          ],
+                              Expanded(
+                                child: _listItem(
+                                    state.accHistoryData, widget.token),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      new Align(
-                        child: loadingIndicator,
-                        alignment: FractionalOffset.center,
-                      ),
-                    ],
+                        new Align(
+                          child: loadingIndicator,
+                          alignment: FractionalOffset.center,
+                        ),
+                      ],
+                    );
+                  } else if (state is LoginFailure) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                    ),
                   );
-                } else if (state is LoginFailure) {
-                  return CircularProgressIndicator();
-                }
-                return CircularProgressIndicator();
-              },
-            )),
+                },
+              ),
+            ),
           )),
     );
   }

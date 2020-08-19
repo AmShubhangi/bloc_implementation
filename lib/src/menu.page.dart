@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fvbank/src/accountDetails.page.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
+import 'loginBloc.dart';
+import 'loginState.dart';
 
 class MenuPage extends StatefulWidget {
   @override
@@ -246,137 +250,149 @@ class _MenuState extends State<MenuPage> {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: CommonTheme.COLOR_PRIMARY,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage('images/user_fill.png'),
-                  ),
-                ),
-              ),
-              Text(
-                'display',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  'group name Account',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    children: <Widget>[
-                      ButtonTheme(
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: FlatButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AccountDetailsPage()),
-                            );
-                          },
-                          child: Text(
-                            'Account Details',
-                            style: TextStyle(
-                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                              color: Colors.black,
-                            ),
-                          ),
+        body: BlocBuilder<LoginBloc, LoginState>(
+          builder: (context, state) {
+            if (state is LoginSuccess) {
+              return SafeArea(
+                bottom: false,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.transparent,
+                          backgroundImage: state.userInfor != null
+                              ? NetworkImage(state.userInfor['image']['url'])
+                              : AssetImage('images/user_fill.png'),
                         ),
                       ),
-                      Divider(
-                        height: 5,
-                        thickness: 1,
-                        color: Colors.grey,
+                    ),
+                    Text(
+                      state.userInfor['display'],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
                       ),
-                      ButtonTheme(
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: FlatButton(
-                          onPressed: () {
-                            _onAlertOpen(
-                                'Please visit https://fvbank.us to contact support.');
-                          },
-                          child: Text(
-                            'Help',
-                            style: TextStyle(
-                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                              color: Colors.black,
-                            ),
-                          ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        state.userInfor['group']['name'] + ' Account',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: CommonTheme.TEXT_SIZE_SMALL,
                         ),
                       ),
-                      Divider(
-                        height: 5,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      ButtonTheme(
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: FlatButton(
-                          onPressed: () {
-                            showSecurityMenu();
-                          },
-                          child: Text(
-                            'Remove Login Pin',
-                            style: TextStyle(
-                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                              color: Colors.black,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        color: Colors.white,
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          children: <Widget>[
+                            ButtonTheme(
+                              minWidth: MediaQuery.of(context).size.width,
+                              child: FlatButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            AccountDetailsPage()),
+                                  );
+                                },
+                                child: Text(
+                                  'Account Details',
+                                  style: TextStyle(
+                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            Divider(
+                              height: 5,
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                            ButtonTheme(
+                              minWidth: MediaQuery.of(context).size.width,
+                              child: FlatButton(
+                                onPressed: () {
+                                  _onAlertOpen(
+                                      'Please visit https://fvbank.us to contact support.');
+                                },
+                                child: Text(
+                                  'Help',
+                                  style: TextStyle(
+                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Divider(
+                              height: 5,
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                            ButtonTheme(
+                              minWidth: MediaQuery.of(context).size.width,
+                              child: FlatButton(
+                                onPressed: () {
+                                  showSecurityMenu();
+                                },
+                                child: Text(
+                                  'Remove Login Pin',
+                                  style: TextStyle(
+                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Divider(
+                              height: 5,
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                            ButtonTheme(
+                              minWidth: MediaQuery.of(context).size.width,
+                              child: FlatButton(
+                                onPressed: () {
+                                  _alertLogout();
+                                },
+                                child: Text(
+                                  'Sign Out',
+                                  style: TextStyle(
+                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Divider(
+                              height: 5,
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                          ],
                         ),
                       ),
-                      Divider(
-                        height: 5,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      ButtonTheme(
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: FlatButton(
-                          onPressed: () {
-                            _alertLogout();
-                          },
-                          child: Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        height: 5,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
+              );
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         ),
       ),
     );

@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
-
-
 abstract class LoginState extends Equatable {
   const LoginState();
 
@@ -19,10 +17,13 @@ class LoginSuccess extends LoginState {
   final Map accInfo;
   final List<dynamic> accHistoryData;
 
-  const LoginSuccess({@required this.userInfor,@required this.accInfo, @required this.accHistoryData});
+  const LoginSuccess(
+      {@required this.userInfor,
+      @required this.accInfo,
+      @required this.accHistoryData});
 
   @override
-  List<Object> get props => [userInfor,accInfo,accHistoryData];
+  List<Object> get props => [userInfor, accInfo, accHistoryData];
 
   @override
   String toString() => 'LoginUserInfor { userInfor: $userInfor }';
