@@ -170,6 +170,61 @@ class _DashboardState extends State<DashboardPage> {
   }
 
   Future<String> _getName(context, int index, dynamic data) async {
+
+
+
+//    if (this.props.transactionDetails.from.kind === 'user') {
+//      let transactionTitle = this.props.transactionDetails.to.type.name;
+//      if (this.props.transactionDetails.kind === 'payment') {
+//        const companyName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
+//        const firstName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_First_Name')?.stringValue;
+//        const lastName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Last_Name')?.stringValue;
+//
+//        if (!!companyName) {
+//          transactionTitle = companyName;
+//        } else if (firstName || lastName) {
+//          transactionTitle = `${firstName} ${lastName}`;
+//    }
+//    } else if (this.props.transactionDetails.kind === 'transferFee') {
+//
+//    }
+//    if (!!transactionTitle) {
+//    to = transactionTitle;
+//    from = this.props.transactionDetails.from.user.display;
+//    }
+//    } else {
+//    let transactionTitle = this.props.transactionDetails.from.type.name;
+//    const senderName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Deposit_Sender')?.stringValue;
+//    if (senderName) {
+//    transactionTitle = senderName;
+//    }
+//    const companyName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
+//    const firstName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_First_Name')?.stringValue;
+//    const lastName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Last_Name')?.stringValue;
+//
+//    if (!!companyName) {
+//    transactionTitle = companyName;
+//    } else if (firstName || lastName) {
+//    transactionTitle = `${firstName} ${lastName}`;
+//    }
+//
+//    if (!!transactionTitle) {
+//    to = this.props.transactionDetails.to.user.display;
+//    from = transactionTitle;
+//    }
+//    }
+//
+//
+//
+//
+
+
+
+
+
+
+
+
     var resTransactionDetails = await userRepository.getTransactionDetail(
         sessionToken: await storage.read(key: "authToken"),
         transactionNumber: data[index]['transactionNumber']);
@@ -177,6 +232,10 @@ class _DashboardState extends State<DashboardPage> {
     String firstName = '';
     String lastName = '';
     String transactionTitle = '';
+    var companyNameXYZ = .find((data) => data.stringValue;
+    var companyNameXYZ = resTransactionDetails ? resTransactionDetails['transaction'] : resTransactionDetails['transaction']['customValues']  ? [];
+     companyNameXYZ.fold(0,((prev ,next)=>{print("prevvv $prev +==== ${next['field']['internalName'] == 'Beneficiary_Company_Name'}")}));
+    print('CompanyName ==>> $companyNameXYZ');
     if (resTransactionDetails['from']['kind'] == 'user') {
       print("If");
 //      transactionSection.TransactionName("to", resTransactionDetails,
@@ -186,6 +245,9 @@ class _DashboardState extends State<DashboardPage> {
         if (resTransactionDetails.containsKey('transaction')) {
           var transactionData = resTransactionDetails['transaction'];
           if (transactionData.containsKey('customValues')) {
+//    var companyNameXYZ = resTransactionDetails['transaction']['customValues'].find((data) => data['field']['internalName'] == 'Beneficiary_Company_Name').stringValue;
+//    print('CompanyName ==>> $companyNameXYZ');
+//        .transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
             var array = resTransactionDetails['transaction']['customValues'];
             for (int i = 0; i < array.length; i++) {
               var singleData = array[i];
@@ -300,7 +362,7 @@ class _DashboardState extends State<DashboardPage> {
     } else {
       return Container(
         color: CommonTheme.COLOR_BRIGHT,
-        width: MediaQuery.of(context).size.width,
+        //width: MediaQuery.of(context).size.width,
         child: Text(
           'Loading',
           textAlign: TextAlign.center,
@@ -333,6 +395,7 @@ class _DashboardState extends State<DashboardPage> {
               child: BlocBuilder<LoginBloc, LoginState>(
                 builder: (context, state) {
                   if (state is LoginSuccess) {
+//                    print('Dashboard Name ==>> ${state.userInfor['group']['name']}');
                     return Stack(
                       children: <Widget>[
                         SafeArea(
@@ -349,14 +412,16 @@ class _DashboardState extends State<DashboardPage> {
                                         fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
                                       ),
                                     ),
-                                    Text(
-                                      state.userInfor['group']['name'] +
-                                          ' Account',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                                      ),
-                                    ),
+//                                    Text(
+//                                      state.userInfor != null
+//                                          ? state.userInfor['group']['name'] +
+//                                              ' Account'
+//                                          : '--',
+//                                      style: TextStyle(
+//                                        color: Colors.white,
+//                                        fontSize: CommonTheme.TEXT_SIZE_SMALL,
+//                                      ),
+//                                    ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 27),
                                       child: Text(

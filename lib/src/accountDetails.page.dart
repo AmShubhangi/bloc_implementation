@@ -154,8 +154,8 @@ class AccountDetailsPage extends StatelessWidget {
                         thickness: 1,
                         color: Colors.grey,
                       ),
-                      rowItem(
-                          context, 'Group', state.userInfor['group']['name']),
+//                      rowItem(
+//                          context, 'Group', state.userInfor['group']['name']),
                       rowItem(context, 'Full Name', state.userInfor['display']),
                       rowItem(context, 'Login Name',
                           state.userInfor['shortDisplay']),

@@ -40,6 +40,11 @@ class OTPComponent extends StatefulWidget {
 }
 
 class _OTPComponentState extends State<OTPComponent> {
+  UserRepository userRepository = new UserRepository();
+
+//  _OTPComponentState({Key key, @required this.userRepository})
+//      : assert(userRepository != null),
+//        super(key: key);
   bool isLoading = false;
 
   handleAPIError(dynamic res) {
@@ -110,7 +115,7 @@ class _OTPComponentState extends State<OTPComponent> {
             await SecurityUtil.removePINCodeSecurity();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
+              MaterialPageRoute(builder: (context) => LoginPage(userRepository: userRepository,)),
             );
           }
         }
@@ -227,13 +232,13 @@ class _OTPComponentState extends State<OTPComponent> {
   Widget build(BuildContext context) {
     Widget loadingIndicator = isLoading
         ? new Container(
-            color: Colors.black.withOpacity(0.3),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
+      color: Colors.black.withOpacity(0.3),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: new Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: new Center(child: new CircularProgressIndicator())),
+    )
         : new Container();
 
     return Scaffold(
@@ -278,7 +283,7 @@ class _OTPComponentState extends State<OTPComponent> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
+                          MaterialPageRoute(builder: (context) => LoginPage(userRepository: userRepository,)),
                         );
                       },
                       child: new Text(

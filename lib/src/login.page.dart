@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fvbank/src/component/pinLogin/newotp.component.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -45,6 +47,8 @@ class _LoginFormState extends State<LoginForm> {
   var _controllerPassword = TextEditingController();
   String username = '';
   String password = '';
+  String userSkippedPINSetup = '';
+  String token = '';
   bool isLoading = false;
 
   @override
@@ -97,7 +101,7 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  void _signInClicked() {
+  void _signInClicked() async {
     print('Username And Password ==>> ');
     print(_controllerUserName.text);
     print(_controllerPassword.text);
@@ -107,7 +111,35 @@ class _LoginFormState extends State<LoginForm> {
         password: _controllerPassword.text,
       ),
     );
+    var tokenStorage = FlutterSecureStorage();
+    var sessionToken = await tokenStorage.read(key: 'authToken');
+    print('Session token ==>> $sessionToken');
+    var userPINSetupSkipped =
+        await SecurityUtil.readValue('userSkippedPINSetup');
+    print('userSkippedPINSetup:-$userSkippedPINSetup');
+    setState(() {
+      userSkippedPINSetup = userPINSetupSkipped;
+      token = sessionToken;
+    });
+    print('Token ==>> $sessionToken');
+    print('userSkippedPINSetup ==>> $userSkippedPINSetup');
 
+//    var tokenStorage = FlutterSecureStorage();
+//    var sessionToken = await tokenStorage.read(key: 'authToken');
+//    print('Session token ==>> $sessionToken');
+//    var userSkippedPINSetup =
+//        await SecurityUtil.readValue('userSkippedPINSetup');
+//    print('userSkippedPINSetup:-$userSkippedPINSetup');
+//    if (userSkippedPINSetup == 'true') {
+//    } else {
+//      // go to alternate screen with user name and password
+//      Navigator.push(
+//        context,
+//        MaterialPageRoute(
+//            builder: (context) => NewOTPComponent(_controllerUserName.text,
+//                _controllerPassword.text, sessionToken)),
+//      );
+//    }
 //    _nextScreen();
   }
 
@@ -154,6 +186,19 @@ class _LoginFormState extends State<LoginForm> {
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
       builder: (context, state) {
         if (state is AuthenticationSuccess) {
+//          if (userSkippedPINSetup == 'true') {
+//            return HomePage();
+//          } else {
+//            // go to alternate screen with user name and password
+//            Navigator.push(
+//              context,
+//              MaterialPageRoute(
+//                  builder: (context) => NewOTPComponent(
+//                      _controllerUserName.text,
+//                      _controllerPassword.text,
+//                      token)),
+//            );
+//          }
           return HomePage();
         }
         return Stack(

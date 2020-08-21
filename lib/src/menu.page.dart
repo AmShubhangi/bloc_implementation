@@ -253,6 +253,7 @@ class _MenuState extends State<MenuPage> {
         body: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             if (state is LoginSuccess) {
+//              print('Menu Name ==>> ${state.userInfor['group']['name']}');
               return SafeArea(
                 bottom: false,
                 child: Column(
@@ -278,16 +279,18 @@ class _MenuState extends State<MenuPage> {
                         fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        state.userInfor['group']['name'] + ' Account',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                        ),
-                      ),
-                    ),
+//                    Padding(
+//                      padding: const EdgeInsets.only(bottom: 16),
+//                      child: Text(
+//                        state.userInfor != null
+//                            ? state.userInfor['group']['name'] + ' Account'
+//                            : '--',
+//                        style: TextStyle(
+//                          color: Colors.white,
+//                          fontSize: CommonTheme.TEXT_SIZE_SMALL,
+//                        ),
+//                      ),
+//                    ),
                     Expanded(
                       flex: 1,
                       child: Container(

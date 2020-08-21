@@ -47,6 +47,7 @@ class SecurityUtil {
 
   static Future<String> getUserName() async {
     String valueUsername = await storage.read(key: userNameKey);
+    print("asd=>$valueUsername");
     if (valueUsername != null) {
       return valueUsername;
     } else {
