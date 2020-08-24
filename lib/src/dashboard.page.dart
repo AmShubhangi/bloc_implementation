@@ -20,9 +20,14 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardState extends State<DashboardPage> {
   bool isLoading = false;
+  var resTransactionDetails;
   UserRepository userRepository;
   var storage = FlutterSecureStorage();
   var transTitle = "";
+  String senderName;
+  String companyName = '';
+  String firstName = '';
+  String lastName = '';
   TransactionSection transactionSection;
 
   @override
@@ -45,37 +50,36 @@ class _DashboardState extends State<DashboardPage> {
     }
   }
 
-  _transactionItemPressed(context, int index, dynamic data) async {
+
+
+  _transactionItemPressed(
+      context, int index, dynamic data, String token) async {
     dynamic transactionNumber = data[index]['transactionNumber'];
-    var resTransactionDetails = await userRepository.getTransactionDetail(
-        sessionToken: await storage.read(key: "authToken"),
-        transactionNumber: transactionNumber);
+
+    dynamic resTransactionDetails = await TransactionSection.getTransactionDetail(token, transactionNumber);
 
     String to = '';
     String from = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
       var transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
-        String companyName = '';
-        String firstName = '';
-        String lastName = '';
         if (resTransactionDetails.containsKey('transaction')) {
           var transactionData = resTransactionDetails['transaction'];
           if (transactionData.containsKey('customValues')) {
-            var array = resTransactionDetails['transaction']['customValues'];
-            for (int i = 0; i < array.length; i++) {
-              var singleData = array[i];
-              var val = singleData['field']['internalName'];
-              if (val == 'Beneficiary_Company_Name') {
-                companyName = singleData['stringValue'];
-              }
-              if (val == 'Beneficiary_First_Name') {
-                firstName = singleData['stringValue'];
-              }
-              if (val == 'Beneficiary_Last_Name') {
-                lastName = singleData['stringValue'];
-              }
-            }
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_Company_Name'
+                    ? (companyName = i['stringValue'])
+                    : (companyName = transactionTitle));
+
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_First_Name'
+                    ? (firstName = i['stringValue'])
+                    : (firstName = transactionTitle));
+
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_Last_Name'
+                    ? (lastName = i['stringValue'])
+                    : (lastName = transactionTitle));
           }
         }
 
@@ -94,30 +98,28 @@ class _DashboardState extends State<DashboardPage> {
     } else {
       var transactionTitle = resTransactionDetails['from']['type']['name'];
 
-      String senderName;
-      String companyName = '';
-      String firstName = '';
-      String lastName = '';
       if (resTransactionDetails.containsKey('transaction')) {
         var transactionData = resTransactionDetails['transaction'];
         if (transactionData.containsKey('customValues')) {
-          var array = resTransactionDetails['transaction']['customValues'];
-          for (int i = 0; i < array.length; i++) {
-            var singleData = array[i];
-            var val = singleData['field']['internalName'];
-            if (val == 'Deposit_Sender') {
-              senderName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_Company_Name') {
-              companyName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_First_Name') {
-              firstName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_Last_Name') {
-              lastName = singleData['stringValue'];
-            }
-          }
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Deposit_Sender'
+                  ? (senderName = i['stringValue'])
+                  : (senderName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_Company_Name'
+                  ? (companyName = i['stringValue'])
+                  : (companyName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_First_Name'
+                  ? (firstName = i['stringValue'])
+                  : (firstName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_Last_Name'
+                  ? (lastName = i['stringValue'])
+                  : (lastName = transactionTitle));
         }
       }
       if (senderName != '') {
@@ -169,99 +171,32 @@ class _DashboardState extends State<DashboardPage> {
         });
   }
 
-  Future<String> _getName(context, int index, dynamic data) async {
-
-
-
-//    if (this.props.transactionDetails.from.kind === 'user') {
-//      let transactionTitle = this.props.transactionDetails.to.type.name;
-//      if (this.props.transactionDetails.kind === 'payment') {
-//        const companyName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
-//        const firstName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_First_Name')?.stringValue;
-//        const lastName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Last_Name')?.stringValue;
-//
-//        if (!!companyName) {
-//          transactionTitle = companyName;
-//        } else if (firstName || lastName) {
-//          transactionTitle = `${firstName} ${lastName}`;
-//    }
-//    } else if (this.props.transactionDetails.kind === 'transferFee') {
-//
-//    }
-//    if (!!transactionTitle) {
-//    to = transactionTitle;
-//    from = this.props.transactionDetails.from.user.display;
-//    }
-//    } else {
-//    let transactionTitle = this.props.transactionDetails.from.type.name;
-//    const senderName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Deposit_Sender')?.stringValue;
-//    if (senderName) {
-//    transactionTitle = senderName;
-//    }
-//    const companyName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
-//    const firstName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_First_Name')?.stringValue;
-//    const lastName = this.props.transactionDetails.transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Last_Name')?.stringValue;
-//
-//    if (!!companyName) {
-//    transactionTitle = companyName;
-//    } else if (firstName || lastName) {
-//    transactionTitle = `${firstName} ${lastName}`;
-//    }
-//
-//    if (!!transactionTitle) {
-//    to = this.props.transactionDetails.to.user.display;
-//    from = transactionTitle;
-//    }
-//    }
-//
-//
-//
-//
-
-
-
-
-
-
-
-
-    var resTransactionDetails = await userRepository.getTransactionDetail(
-        sessionToken: await storage.read(key: "authToken"),
-        transactionNumber: data[index]['transactionNumber']);
-    String companyName = '';
-    String firstName = '';
-    String lastName = '';
+  Future<dynamic> _getName(
+      context, int index, dynamic data, String token) async {
+//    dynamic resTransactionDetails =
+//        await _getTransactionDetail(token, data[index]['transactionNumber']);
+  dynamic resTransactionDetails = await TransactionSection.getTransactionDetail(token, data[index]['transactionNumber']);
     String transactionTitle = '';
-    var companyNameXYZ = .find((data) => data.stringValue;
-    var companyNameXYZ = resTransactionDetails ? resTransactionDetails['transaction'] : resTransactionDetails['transaction']['customValues']  ? [];
-     companyNameXYZ.fold(0,((prev ,next)=>{print("prevvv $prev +==== ${next['field']['internalName'] == 'Beneficiary_Company_Name'}")}));
-    print('CompanyName ==>> $companyNameXYZ');
     if (resTransactionDetails['from']['kind'] == 'user') {
-      print("If");
-//      transactionSection.TransactionName("to", resTransactionDetails,
-//          resTransactionDetails['to']['type']['name']);
       transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
         if (resTransactionDetails.containsKey('transaction')) {
           var transactionData = resTransactionDetails['transaction'];
           if (transactionData.containsKey('customValues')) {
-//    var companyNameXYZ = resTransactionDetails['transaction']['customValues'].find((data) => data['field']['internalName'] == 'Beneficiary_Company_Name').stringValue;
-//    print('CompanyName ==>> $companyNameXYZ');
-//        .transaction?.customValues?.find(data => data.field.internalName === 'Beneficiary_Company_Name')?.stringValue;
-            var array = resTransactionDetails['transaction']['customValues'];
-            for (int i = 0; i < array.length; i++) {
-              var singleData = array[i];
-              var val = singleData['field']['internalName'];
-              if (val == 'Beneficiary_Company_Name') {
-                companyName = singleData['stringValue'];
-              }
-              if (val == 'Beneficiary_First_Name') {
-                firstName = singleData['stringValue'];
-              }
-              if (val == 'Beneficiary_Last_Name') {
-                lastName = singleData['stringValue'];
-              }
-            }
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_Company_Name'
+                    ? (companyName = i['stringValue'])
+                    : (companyName = transactionTitle));
+
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_First_Name'
+                    ? (firstName = i['stringValue'])
+                    : (firstName = transactionTitle));
+
+            resTransactionDetails['transaction']['customValues'].map((i) =>
+                i['field']['internalName'] == 'Beneficiary_Last_Name'
+                    ? (lastName = i['stringValue'])
+                    : (lastName = transactionTitle));
           }
         }
         if (companyName != '') {
@@ -273,34 +208,28 @@ class _DashboardState extends State<DashboardPage> {
         }
       } else if (resTransactionDetails['kind'] == 'transferFee') {}
     } else {
-      print("else");
-//      transactionSection.TransactionName("from", resTransactionDetails,
-//          resTransactionDetails['from']['type']['name']);
-
-      String senderName;
-      String companyName = '';
-      String firstName = '';
-      String lastName = '';
       if (resTransactionDetails.containsKey('transaction')) {
         var transactionData = resTransactionDetails['transaction'];
         if (transactionData.containsKey('customValues')) {
-          var array = resTransactionDetails['transaction']['customValues'];
-          for (int i = 0; i < array.length; i++) {
-            var singleData = array[i];
-            var val = singleData['field']['internalName'];
-            if (val == 'Deposit_Sender') {
-              senderName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_Company_Name') {
-              companyName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_First_Name') {
-              firstName = singleData['stringValue'];
-            }
-            if (val == 'Beneficiary_Last_Name') {
-              lastName = singleData['stringValue'];
-            }
-          }
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Deposit_Sender'
+                  ? (senderName = i['stringValue'])
+                  : (senderName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_Company_Name'
+                  ? (companyName = i['stringValue'])
+                  : (companyName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_First_Name'
+                  ? (firstName = i['stringValue'])
+                  : (firstName = transactionTitle));
+
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+              i['field']['internalName'] == 'Beneficiary_Last_Name'
+                  ? (lastName = i['stringValue'])
+                  : (lastName = transactionTitle));
         }
       }
       if (senderName != '') {
@@ -317,7 +246,7 @@ class _DashboardState extends State<DashboardPage> {
     return transactionTitle;
   }
 
-  dynamic _listItem(List<dynamic> historyListData) {
+  dynamic _listItem(List<dynamic> historyListData, String token) {
     if (historyListData.length > 0 || historyListData != null) {
       return Container(
         child: ListView.separated(
@@ -330,8 +259,8 @@ class _DashboardState extends State<DashboardPage> {
               final String formattedDate = formatter.format(date);
               return GestureDetector(
                 child: IntrinsicHeight(
-                  child: FutureBuilder<String>(
-                      future: _getName(context, index, historyListData),
+                  child: FutureBuilder<dynamic>(
+                      future: _getName(context, index, historyListData, token),
                       builder: (context, snapshot) {
                         return TransactionItemComponent(
                           companyName: snapshot.hasData ? snapshot.data : '--',
@@ -349,7 +278,8 @@ class _DashboardState extends State<DashboardPage> {
                   setState(() {
                     isLoading = true;
                   });
-                  _transactionItemPressed(context, index, historyListData);
+                  _transactionItemPressed(
+                      context, index, historyListData, token);
                 },
               );
             },
@@ -395,7 +325,6 @@ class _DashboardState extends State<DashboardPage> {
               child: BlocBuilder<LoginBloc, LoginState>(
                 builder: (context, state) {
                   if (state is LoginSuccess) {
-//                    print('Dashboard Name ==>> ${state.userInfor['group']['name']}');
                     return Stack(
                       children: <Widget>[
                         SafeArea(
@@ -451,7 +380,8 @@ class _DashboardState extends State<DashboardPage> {
                                 ),
                               ),
                               Expanded(
-                                child: _listItem(state.accHistoryData),
+                                child: _listItem(
+                                    state.accHistoryData, state.token),
                               ),
                             ],
                           ),
@@ -466,6 +396,7 @@ class _DashboardState extends State<DashboardPage> {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
+//                  handleAPIError(state.error);
                   }
                   return Center(
                     child: CircularProgressIndicator(

@@ -13,17 +13,19 @@ class LoginInitial extends LoginState {}
 class LoginInProgress extends LoginState {}
 
 class LoginSuccess extends LoginState {
+  final String token;
   final Map userInfor;
   final Map accInfo;
   final List<dynamic> accHistoryData;
 
   const LoginSuccess(
-      {@required this.userInfor,
+      {@required this.token,
+        @required this.userInfor,
       @required this.accInfo,
       @required this.accHistoryData});
 
   @override
-  List<Object> get props => [userInfor, accInfo, accHistoryData];
+  List<Object> get props => [token, userInfor, accInfo, accHistoryData];
 
   @override
   String toString() => 'LoginUserInfor { userInfor: $userInfor }';

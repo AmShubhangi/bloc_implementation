@@ -37,7 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         Map accObj = await userRepository.getAccounts(sessionToken: token);
         List<dynamic> accHistoryData = await userRepository.getAccountsHistory(
             sessionToken: token, accountType: accObj['type']['internalName']);
-        yield LoginSuccess(userInfor: userObj, accInfo: accObj, accHistoryData:accHistoryData);
+        yield LoginSuccess(token:token, userInfor: userObj, accInfo: accObj, accHistoryData:accHistoryData);
       } catch (error) {
         yield LoginFailure(error: error.toString());
       }
