@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationBloc.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationEvent.dart';
 import 'package:fvbank/src/bloc/authentationBloc/authenticationState.dart';
-import 'package:fvbank/src/component/pinLogin/otp.component.dart';
 import 'package:fvbank/src/login.page.dart';
-import 'package:fvbank/src/modal/app_state.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:user_repository/user_repository.dart';
 
@@ -66,7 +64,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var result = getValue();
     return FutureBuilder<String>(
       future: SecurityUtil.isPINCodeSecurityEnabled(),
       builder: (context, AsyncSnapshot<String> snapshot) {

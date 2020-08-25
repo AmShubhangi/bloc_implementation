@@ -44,68 +44,27 @@ class _DashboardState extends State<DashboardPage> {
     if (res['code'] == 'loggedOut') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => LoginPage(userRepository: userRepository,)),
       );
       return;
     }
   }
 
-
-
   _transactionItemPressed(
       context, int index, dynamic data, String token) async {
     dynamic transactionNumber = data[index]['transactionNumber'];
 
-    dynamic resTransactionDetails = await TransactionSection.getTransactionDetail(token, transactionNumber);
+    dynamic resTransactionDetails =
+        await TransactionSection.getTransactionDetail(token, transactionNumber);
 
     String to = '';
     String from = '';
+    var transactionData = resTransactionDetails.containsKey('transaction') ? resTransactionDetails['transaction'] : '';
+    bool isTrue = resTransactionDetails.containsKey('transaction') ? transactionData.containsKey('customValues') : null;
     if (resTransactionDetails['from']['kind'] == 'user') {
       var transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
-        if (resTransactionDetails.containsKey('transaction')) {
-          var transactionData = resTransactionDetails['transaction'];
-          if (transactionData.containsKey('customValues')) {
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_Company_Name'
-                    ? (companyName = i['stringValue'])
-                    : (companyName = transactionTitle));
-
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_First_Name'
-                    ? (firstName = i['stringValue'])
-                    : (firstName = transactionTitle));
-
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_Last_Name'
-                    ? (lastName = i['stringValue'])
-                    : (lastName = transactionTitle));
-          }
-        }
-
-        if (companyName != '') {
-          transactionTitle = companyName;
-        } else if (firstName != '' || lastName != '') {
-          transactionTitle = '$firstName $lastName';
-        } else if (companyName == '' || firstName == '' || lastName == '') {
-          transactionTitle = resTransactionDetails['to']['type']['name'];
-        }
-      } else if (resTransactionDetails['kind'] == 'transferFee') {}
-      if (transactionTitle != '') {
-        to = transactionTitle;
-        from = resTransactionDetails['from']['user']['display'];
-      }
-    } else {
-      var transactionTitle = resTransactionDetails['from']['type']['name'];
-
-      if (resTransactionDetails.containsKey('transaction')) {
-        var transactionData = resTransactionDetails['transaction'];
-        if (transactionData.containsKey('customValues')) {
-          resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Deposit_Sender'
-                  ? (senderName = i['stringValue'])
-                  : (senderName = transactionTitle));
-
+        if (isTrue) {
           resTransactionDetails['transaction']['customValues'].map((i) =>
               i['field']['internalName'] == 'Beneficiary_Company_Name'
                   ? (companyName = i['stringValue'])
@@ -121,17 +80,34 @@ class _DashboardState extends State<DashboardPage> {
                   ? (lastName = i['stringValue'])
                   : (lastName = transactionTitle));
         }
+        (companyName != '')
+            ? transactionTitle = companyName
+            : (firstName != '' || lastName != '')
+                ? transactionTitle = '$firstName $lastName'
+                : (companyName == '' || firstName == '' || lastName == '')
+                    ? transactionTitle =
+                        resTransactionDetails['to']['type']['name']
+                    // ignore: unnecessary_statements
+                    : transactionTitle;
+      } else if (resTransactionDetails['kind'] == 'transferFee') {}
+      if (transactionTitle != '') {
+        to = transactionTitle;
+        from = resTransactionDetails['from']['user']['display'];
       }
-      if (senderName != '') {
-        transactionTitle = senderName;
+    } else {
+      var transactionTitle = resTransactionDetails['from']['type']['name'];
+      if (isTrue) {
+        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Deposit_Sender' ? (senderName = i['stringValue']) : (senderName = transactionTitle));
+
+        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Company_Name' ? (companyName = i['stringValue']) : (companyName = transactionTitle));
+
+        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_First_Name' ? (firstName = i['stringValue']) : (firstName = transactionTitle));
+
+        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Last_Name' ? (lastName = i['stringValue']) : (lastName = transactionTitle));
       }
-      if (companyName != '') {
-        transactionTitle = companyName;
-      } else if (firstName != '' || lastName != '') {
-        transactionTitle = '$firstName $lastName';
-      } else if (companyName == '' || firstName == '' || lastName == '') {
-        transactionTitle = resTransactionDetails['from']['type']['name'];
-      }
+
+      // ignore: unnecessary_statements
+      (companyName != '') ? transactionTitle = companyName : (firstName != '' || lastName != '') ? transactionTitle = '$firstName $lastName' : (companyName == '' || firstName == '' || lastName == '') ? transactionTitle = resTransactionDetails['from']['type']['name'] : (senderName != '') ? transactionTitle = senderName : transactionTitle;
 
       if (transactionTitle != '') {
         to = resTransactionDetails['to']['user']['display'];
@@ -149,8 +125,7 @@ class _DashboardState extends State<DashboardPage> {
 
     dynamic typeName = data[index]['type'];
     DateTime date = DateTime.parse(data[index]['date']);
-    final DateFormat formatter = DateFormat('MM-dd-yyyy hh:mm a');
-    final String formattedDate = formatter.format(date);
+    var tDate = new DateFormat('MM-dd-yyyy hh:mm a').format(date);
     setState(() {
       isLoading = false;
     });
@@ -159,7 +134,7 @@ class _DashboardState extends State<DashboardPage> {
         builder: (BuildContext context) {
           return TransactionDetailComponent(
             transactionNumber: transactionNumber,
-            date: formattedDate,
+            date: tDate,
             amount: data[index]['amount'],
             performedBy: performedBy,
             from: from,
@@ -173,75 +148,69 @@ class _DashboardState extends State<DashboardPage> {
 
   Future<dynamic> _getName(
       context, int index, dynamic data, String token) async {
-//    dynamic resTransactionDetails =
-//        await _getTransactionDetail(token, data[index]['transactionNumber']);
-  dynamic resTransactionDetails = await TransactionSection.getTransactionDetail(token, data[index]['transactionNumber']);
+    dynamic resTransactionDetails =
+        await TransactionSection.getTransactionDetail(
+            token, data[index]['transactionNumber']);
+    var transactionData = resTransactionDetails.containsKey('transaction')
+        ? resTransactionDetails['transaction']
+        : '';
+    bool isTrue = resTransactionDetails.containsKey('transaction')
+        ? transactionData.containsKey('customValues')
+        : null;
     String transactionTitle = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
       transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
-        if (resTransactionDetails.containsKey('transaction')) {
-          var transactionData = resTransactionDetails['transaction'];
-          if (transactionData.containsKey('customValues')) {
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_Company_Name'
-                    ? (companyName = i['stringValue'])
-                    : (companyName = transactionTitle));
+        if (isTrue) {
+          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Company_Name' ? (companyName = i['stringValue']) : (companyName = transactionTitle));
 
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_First_Name'
-                    ? (firstName = i['stringValue'])
-                    : (firstName = transactionTitle));
+          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_First_Name' ? (firstName = i['stringValue']) : (firstName = transactionTitle));
 
-            resTransactionDetails['transaction']['customValues'].map((i) =>
-                i['field']['internalName'] == 'Beneficiary_Last_Name'
-                    ? (lastName = i['stringValue'])
-                    : (lastName = transactionTitle));
-          }
+          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Last_Name' ? (lastName = i['stringValue']) : (lastName = transactionTitle));
         }
-        if (companyName != '') {
-          transactionTitle = companyName;
-        } else if (firstName != '' || lastName != '') {
-          transactionTitle = '$firstName $lastName';
-        } else if (companyName == '' || firstName == '' || lastName == '') {
-          transactionTitle = resTransactionDetails['to']['type']['name'];
-        }
+        (companyName != '')
+            ? transactionTitle = companyName
+            : (firstName != '' || lastName != '')
+                ? transactionTitle = '$firstName $lastName'
+                : (companyName == '' || firstName == '' || lastName == '')
+                    ? transactionTitle =
+                        resTransactionDetails['to']['type']['name']
+                    // ignore: unnecessary_statements
+                    : transactionTitle;
       } else if (resTransactionDetails['kind'] == 'transferFee') {}
     } else {
-      if (resTransactionDetails.containsKey('transaction')) {
-        var transactionData = resTransactionDetails['transaction'];
-        if (transactionData.containsKey('customValues')) {
-          resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Deposit_Sender'
-                  ? (senderName = i['stringValue'])
-                  : (senderName = transactionTitle));
+      if (isTrue) {
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+            i['field']['internalName'] == 'Deposit_Sender'
+                ? (senderName = i['stringValue'])
+                : (senderName = transactionTitle));
 
-          resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_Company_Name'
-                  ? (companyName = i['stringValue'])
-                  : (companyName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+            i['field']['internalName'] == 'Beneficiary_Company_Name'
+                ? (companyName = i['stringValue'])
+                : (companyName = transactionTitle));
 
-          resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_First_Name'
-                  ? (firstName = i['stringValue'])
-                  : (firstName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+            i['field']['internalName'] == 'Beneficiary_First_Name'
+                ? (firstName = i['stringValue'])
+                : (firstName = transactionTitle));
 
-          resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_Last_Name'
-                  ? (lastName = i['stringValue'])
-                  : (lastName = transactionTitle));
-        }
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+            i['field']['internalName'] == 'Beneficiary_Last_Name'
+                ? (lastName = i['stringValue'])
+                : (lastName = transactionTitle));
       }
-      if (senderName != '') {
-        transactionTitle = senderName;
-      }
-      if (companyName != '') {
-        transactionTitle = companyName;
-      } else if (firstName != '' || lastName != '') {
-        transactionTitle = '$firstName $lastName';
-      } else if (companyName == '' || firstName == '' || lastName == '') {
-        transactionTitle = resTransactionDetails['from']['type']['name'];
-      }
+      (companyName != '')
+          ? transactionTitle = companyName
+          : (firstName != '' || lastName != '')
+              ? transactionTitle = '$firstName $lastName'
+              : (companyName == '' || firstName == '' || lastName == '')
+                  ? transactionTitle =
+                      resTransactionDetails['from']['type']['name']
+                  : (senderName != '')
+                      ? transactionTitle = senderName
+                      // ignore: unnecessary_statements
+                      : transactionTitle;
     }
     return transactionTitle;
   }
@@ -253,7 +222,6 @@ class _DashboardState extends State<DashboardPage> {
             shrinkWrap: true,
             itemCount: historyListData.length,
             itemBuilder: (BuildContext context, int index) {
-              dynamic typeName = historyListData[index]['type'];
               DateTime date = DateTime.parse(historyListData[index]['date']);
               final DateFormat formatter = DateFormat('MM-dd-yyyy hh:mm a');
               final String formattedDate = formatter.format(date);

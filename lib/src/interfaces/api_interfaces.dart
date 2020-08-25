@@ -33,7 +33,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse('https://dev.backend.fvbank.us/api/users/self');
       uri = uri.replace(queryParameters: <String, List<String>>{
         'fields': [
@@ -63,7 +62,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse('https://dev.backend.fvbank.us/api/self/accounts');
       uri = uri.replace(queryParameters: <String, List<String>>{
         'fields': [
@@ -92,7 +90,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse(
           'https://dev.backend.fvbank.us/api/self/accounts/$accountType/history');
       uri = uri.replace(queryParameters: <String, dynamic>{

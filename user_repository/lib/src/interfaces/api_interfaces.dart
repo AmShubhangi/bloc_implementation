@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -30,7 +31,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse('https://dev.backend.fvbank.us/api/users/self');
       uri = uri.replace(queryParameters: <String, List<String>>{
         'fields': [
@@ -59,7 +59,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse('https://dev.backend.fvbank.us/api/self/accounts');
       uri = uri.replace(queryParameters: <String, List<String>>{
         'fields': [
@@ -88,7 +87,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse(
           'https://dev.backend.fvbank.us/api/self/accounts/$accountType/history');
       uri = uri.replace(queryParameters: <String, dynamic>{
@@ -120,7 +118,6 @@ class APIInterfaces {
         'accept': 'application/json',
         'channel': 'mobile'
       };
-      final body = {};
       var uri = Uri.parse(
           'https://dev.backend.fvbank.us/api/transfers/$transactionNumber');
       uri = uri.replace(queryParameters: <String, dynamic>{'fields': []});

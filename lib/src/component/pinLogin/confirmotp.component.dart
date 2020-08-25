@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fvbank/src/commonFunc.dart';
 import 'package:fvbank/src/component/pinLogin/keyboard.component.dart';
 import 'package:fvbank/src/component/pinLogin/pinNumber.component.dart';
 import 'package:fvbank/src/home.page.dart';
 import 'package:fvbank/src/interfaces/api_interfaces.dart';
 import 'package:fvbank/src/login.page.dart';
-import 'package:fvbank/src/modal/app_state.dart';
-import 'package:fvbank/src/redux/actions.dart';
 import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -81,7 +80,7 @@ class _ConfirmOTPComponentState extends State<ConfirmOTPComponent> {
     if (res['code'] == 'loggedOut') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => LoginPage(userRepository: userRepository,)),
       );
       return;
     }

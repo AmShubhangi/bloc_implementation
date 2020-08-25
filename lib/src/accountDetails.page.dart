@@ -81,7 +81,6 @@ class AccountDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double doubleTypeAmount = 0;
     return MaterialApp(
       home: Scaffold(
         body: BlocBuilder<LoginBloc, LoginState>(
