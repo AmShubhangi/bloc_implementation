@@ -1,3 +1,4 @@
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:user_repository/user_repository.dart';
 
 UserRepository userRepository = new UserRepository();
@@ -26,4 +27,28 @@ class TransactionSection {
         sessionToken: token, transactionNumber: transactionNumber);
     return response;
   }
+
+
+// alertLoginError() {
+//   Alert(
+//     context: context,
+//     title: 'Please enter proper credentials.',
+//     buttons: [
+//       DialogButton(
+//         color: Color.fromRGBO(17, 17, 68, 1),
+//         child: Text(
+//           'Close',
+//           style: TextStyle(color: Colors.white),
+//         ),
+//         onPressed: () {
+//           FocusScope.of(context).requestFocus(focusUsername);
+//           _controllerUserName.clear();
+//           _controllerPassword.clear();
+//           Navigator.of(context, rootNavigator: true).pop();
+//         },
+//         width: 120,
+//       )
+//     ],
+//   ).show();
+// }
 }

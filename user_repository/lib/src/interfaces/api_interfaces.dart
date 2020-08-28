@@ -20,7 +20,8 @@ class APIInterfaces {
       final response = await http.post(uri, headers: headers, body: body);
       return jsonDecode(response.body);
     } catch (e) {
-      print(e);
+      print('Error Catch ==>> $e');
+      return handleAPIError(e);
     }
   }
 
@@ -49,6 +50,7 @@ class APIInterfaces {
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
+      return handleAPIError(e);
     }
   }
 
@@ -76,6 +78,7 @@ class APIInterfaces {
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
+      return handleAPIError(e);
     }
   }
 
@@ -107,6 +110,7 @@ class APIInterfaces {
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
+      return handleAPIError(e);
     }
   }
 
@@ -122,18 +126,21 @@ class APIInterfaces {
           'https://dev.backend.fvbank.us/api/transfers/$transactionNumber');
       uri = uri.replace(queryParameters: <String, dynamic>{'fields': []});
       final response = await http.get(uri, headers: headers);
-//
-//      if (jsonDecode(response.body)['code'] == 'loggedOut' &&
-//          response.statusCode == 401) {
-//        Navigator.push(
-//          context,
-//          MaterialPageRoute(builder: (context) => LoginPage()),
-//        );
-//        return;
-//      }
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
+      return handleAPIError(e);
+    }
+  }
+
+ static handleAPIError(dynamic res) {
+    print('handleAPIError ==>> $res');
+    print('handleAPIError ==>> ${res['code']}');
+    if (res['code'] == 'login') {
+      print('Facing Some Issue in your email and password! ==>> $res');
+      return;
+    } else if (res['code'] == 'loggedOut') {
+      return;
     }
   }
 }

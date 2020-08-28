@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:fvbank/src/component/pinLogin/newotp.component.dart';
-import 'package:fvbank/src/utils/security.storage.util.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:user_repository/user_repository.dart';
@@ -111,35 +108,9 @@ class _LoginFormState extends State<LoginForm> {
         password: _controllerPassword.text,
       ),
     );
-    var tokenStorage = FlutterSecureStorage();
-    var sessionToken = await tokenStorage.read(key: 'authToken');
-    print('Session token ==>> $sessionToken');
-    var userPINSetupSkipped =
-        await SecurityUtil.readValue('userSkippedPINSetup');
-    print('userSkippedPINSetup:-$userSkippedPINSetup');
-    setState(() {
-      userSkippedPINSetup = userPINSetupSkipped;
-      token = sessionToken;
-    });
-    print('Token ==>> $sessionToken');
-    print('userSkippedPINSetup ==>> $userSkippedPINSetup');
 
-//    var tokenStorage = FlutterSecureStorage();
-//    var sessionToken = await tokenStorage.read(key: 'authToken');
-//    print('Session token ==>> $sessionToken');
-//    var userSkippedPINSetup =
-//        await SecurityUtil.readValue('userSkippedPINSetup');
-//    print('userSkippedPINSetup:-$userSkippedPINSetup');
-//    if (userSkippedPINSetup == 'true') {
-//    } else {
-//      // go to alternate screen with user name and password
-//      Navigator.push(
-//        context,
-//        MaterialPageRoute(
-//            builder: (context) => NewOTPComponent(_controllerUserName.text,
-//                _controllerPassword.text, sessionToken)),
-//      );
-//    }
+//  Alert(context: context, title: "RFLUTTER", desc: "Flutter is awesome.")
+//        .show();
 //    _nextScreen();
   }
 
@@ -184,7 +155,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
+      builder: (BuildContext context, state) {
         if (state is AuthenticationSuccess) {
 //          if (userSkippedPINSetup == 'true') {
 //            return HomePage();
@@ -200,6 +171,9 @@ class _LoginFormState extends State<LoginForm> {
 //            );
 //          }
           return HomePage();
+        }
+        if (state is AuthenticationFailure) {
+          return Container();
         }
         return Stack(
           children: <Widget>[

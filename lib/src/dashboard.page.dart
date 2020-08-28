@@ -44,7 +44,10 @@ class _DashboardState extends State<DashboardPage> {
     if (res['code'] == 'loggedOut') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage(userRepository: userRepository,)),
+        MaterialPageRoute(
+            builder: (context) => LoginPage(
+              userRepository: userRepository,
+            )),
       );
       return;
     }
@@ -55,40 +58,44 @@ class _DashboardState extends State<DashboardPage> {
     dynamic transactionNumber = data[index]['transactionNumber'];
 
     dynamic resTransactionDetails =
-        await TransactionSection.getTransactionDetail(token, transactionNumber);
+    await TransactionSection.getTransactionDetail(token, transactionNumber);
 
     String to = '';
     String from = '';
-    var transactionData = resTransactionDetails.containsKey('transaction') ? resTransactionDetails['transaction'] : '';
-    bool isTrue = resTransactionDetails.containsKey('transaction') ? transactionData.containsKey('customValues') : null;
+    var transactionData = resTransactionDetails.containsKey('transaction')
+        ? resTransactionDetails['transaction']
+        : [];
+    bool isTrue = resTransactionDetails.containsKey('transaction')
+        ? transactionData.containsKey('customValues')
+        : false;
     if (resTransactionDetails['from']['kind'] == 'user') {
       var transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
         if (isTrue) {
           resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_Company_Name'
-                  ? (companyName = i['stringValue'])
-                  : (companyName = transactionTitle));
+          i['field']['internalName'] == 'Beneficiary_Company_Name'
+              ? (companyName = i['stringValue'])
+              : (companyName = transactionTitle));
 
           resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_First_Name'
-                  ? (firstName = i['stringValue'])
-                  : (firstName = transactionTitle));
+          i['field']['internalName'] == 'Beneficiary_First_Name'
+              ? (firstName = i['stringValue'])
+              : (firstName = transactionTitle));
 
           resTransactionDetails['transaction']['customValues'].map((i) =>
-              i['field']['internalName'] == 'Beneficiary_Last_Name'
-                  ? (lastName = i['stringValue'])
-                  : (lastName = transactionTitle));
+          i['field']['internalName'] == 'Beneficiary_Last_Name'
+              ? (lastName = i['stringValue'])
+              : (lastName = transactionTitle));
         }
         (companyName != '')
             ? transactionTitle = companyName
             : (firstName != '' || lastName != '')
-                ? transactionTitle = '$firstName $lastName'
-                : (companyName == '' || firstName == '' || lastName == '')
-                    ? transactionTitle =
-                        resTransactionDetails['to']['type']['name']
-                    // ignore: unnecessary_statements
-                    : transactionTitle;
+            ? transactionTitle = '$firstName $lastName'
+            : (companyName == '' || firstName == '' || lastName == '')
+            ? transactionTitle =
+        resTransactionDetails['to']['type']['name']
+        // ignore: unnecessary_statements
+            : transactionTitle;
       } else if (resTransactionDetails['kind'] == 'transferFee') {}
       if (transactionTitle != '') {
         to = transactionTitle;
@@ -97,17 +104,38 @@ class _DashboardState extends State<DashboardPage> {
     } else {
       var transactionTitle = resTransactionDetails['from']['type']['name'];
       if (isTrue) {
-        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Deposit_Sender' ? (senderName = i['stringValue']) : (senderName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+        i['field']['internalName'] == 'Deposit_Sender'
+            ? (senderName = i['stringValue'])
+            : (senderName = transactionTitle));
 
-        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Company_Name' ? (companyName = i['stringValue']) : (companyName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+        i['field']['internalName'] == 'Beneficiary_Company_Name'
+            ? (companyName = i['stringValue'])
+            : (companyName = transactionTitle));
 
-        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_First_Name' ? (firstName = i['stringValue']) : (firstName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+        i['field']['internalName'] == 'Beneficiary_First_Name'
+            ? (firstName = i['stringValue'])
+            : (firstName = transactionTitle));
 
-        resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Last_Name' ? (lastName = i['stringValue']) : (lastName = transactionTitle));
+        resTransactionDetails['transaction']['customValues'].map((i) =>
+        i['field']['internalName'] == 'Beneficiary_Last_Name'
+            ? (lastName = i['stringValue'])
+            : (lastName = transactionTitle));
       }
 
       // ignore: unnecessary_statements
-      (companyName != '') ? transactionTitle = companyName : (firstName != '' || lastName != '') ? transactionTitle = '$firstName $lastName' : (companyName == '' || firstName == '' || lastName == '') ? transactionTitle = resTransactionDetails['from']['type']['name'] : (senderName != '') ? transactionTitle = senderName : transactionTitle;
+      (companyName != '')
+          ? transactionTitle = companyName
+          : (firstName != '' || lastName != '')
+          ? transactionTitle = '$firstName $lastName'
+          : (companyName == '' || firstName == '' || lastName == '')
+          ? transactionTitle =
+      resTransactionDetails['from']['type']['name']
+          : (senderName != '')
+          ? transactionTitle = senderName
+          : transactionTitle;
 
       if (transactionTitle != '') {
         to = resTransactionDetails['to']['user']['display'];
@@ -149,68 +177,77 @@ class _DashboardState extends State<DashboardPage> {
   Future<dynamic> _getName(
       context, int index, dynamic data, String token) async {
     dynamic resTransactionDetails =
-        await TransactionSection.getTransactionDetail(
-            token, data[index]['transactionNumber']);
+    await TransactionSection.getTransactionDetail(
+        token, data[index]['transactionNumber']);
     var transactionData = resTransactionDetails.containsKey('transaction')
         ? resTransactionDetails['transaction']
         : '';
     bool isTrue = resTransactionDetails.containsKey('transaction')
         ? transactionData.containsKey('customValues')
-        : null;
+        : false;
     String transactionTitle = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
       transactionTitle = resTransactionDetails['to']['type']['name'];
       if (resTransactionDetails['kind'] == 'payment') {
         if (isTrue) {
-          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Company_Name' ? (companyName = i['stringValue']) : (companyName = transactionTitle));
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+          i['field']['internalName'] == 'Beneficiary_Company_Name'
+              ? (companyName = i['stringValue'])
+              : (companyName = transactionTitle));
 
-          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_First_Name' ? (firstName = i['stringValue']) : (firstName = transactionTitle));
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+          i['field']['internalName'] == 'Beneficiary_First_Name'
+              ? (firstName = i['stringValue'])
+              : (firstName = transactionTitle));
 
-          resTransactionDetails['transaction']['customValues'].map((i) => i['field']['internalName'] == 'Beneficiary_Last_Name' ? (lastName = i['stringValue']) : (lastName = transactionTitle));
+          resTransactionDetails['transaction']['customValues'].map((i) =>
+          i['field']['internalName'] == 'Beneficiary_Last_Name'
+              ? (lastName = i['stringValue'])
+              : (lastName = transactionTitle));
         }
         (companyName != '')
             ? transactionTitle = companyName
             : (firstName != '' || lastName != '')
-                ? transactionTitle = '$firstName $lastName'
-                : (companyName == '' || firstName == '' || lastName == '')
-                    ? transactionTitle =
-                        resTransactionDetails['to']['type']['name']
-                    // ignore: unnecessary_statements
-                    : transactionTitle;
+            ? transactionTitle = '$firstName $lastName'
+            : (companyName == '' || firstName == '' || lastName == '')
+            ? transactionTitle =
+        resTransactionDetails['to']['type']['name']
+        // ignore: unnecessary_statements
+            : transactionTitle;
       } else if (resTransactionDetails['kind'] == 'transferFee') {}
     } else {
       if (isTrue) {
         resTransactionDetails['transaction']['customValues'].map((i) =>
-            i['field']['internalName'] == 'Deposit_Sender'
-                ? (senderName = i['stringValue'])
-                : (senderName = transactionTitle));
+        i['field']['internalName'] == 'Deposit_Sender'
+            ? (senderName = i['stringValue'])
+            : (senderName = transactionTitle));
 
         resTransactionDetails['transaction']['customValues'].map((i) =>
-            i['field']['internalName'] == 'Beneficiary_Company_Name'
-                ? (companyName = i['stringValue'])
-                : (companyName = transactionTitle));
+        i['field']['internalName'] == 'Beneficiary_Company_Name'
+            ? (companyName = i['stringValue'])
+            : (companyName = transactionTitle));
 
         resTransactionDetails['transaction']['customValues'].map((i) =>
-            i['field']['internalName'] == 'Beneficiary_First_Name'
-                ? (firstName = i['stringValue'])
-                : (firstName = transactionTitle));
+        i['field']['internalName'] == 'Beneficiary_First_Name'
+            ? (firstName = i['stringValue'])
+            : (firstName = transactionTitle));
 
         resTransactionDetails['transaction']['customValues'].map((i) =>
-            i['field']['internalName'] == 'Beneficiary_Last_Name'
-                ? (lastName = i['stringValue'])
-                : (lastName = transactionTitle));
+        i['field']['internalName'] == 'Beneficiary_Last_Name'
+            ? (lastName = i['stringValue'])
+            : (lastName = transactionTitle));
       }
       (companyName != '')
           ? transactionTitle = companyName
           : (firstName != '' || lastName != '')
-              ? transactionTitle = '$firstName $lastName'
-              : (companyName == '' || firstName == '' || lastName == '')
-                  ? transactionTitle =
-                      resTransactionDetails['from']['type']['name']
-                  : (senderName != '')
-                      ? transactionTitle = senderName
-                      // ignore: unnecessary_statements
-                      : transactionTitle;
+          ? transactionTitle = '$firstName $lastName'
+          : (companyName == '' || firstName == '' || lastName == '')
+          ? transactionTitle =
+      resTransactionDetails['from']['type']['name']
+          : (senderName != '')
+          ? transactionTitle = senderName
+      // ignore: unnecessary_statements
+          : transactionTitle;
     }
     return transactionTitle;
   }
@@ -235,7 +272,7 @@ class _DashboardState extends State<DashboardPage> {
                           dateTime: formattedDate,
                           amount: historyListData[index]['amount'],
                           transactionId: historyListData[index]
-                              ['transactionNumber'],
+                          ['transactionNumber'],
                           description: historyListData[index]['description'],
                           imagePath: 'images/icon_bank.png',
                         );
@@ -252,10 +289,10 @@ class _DashboardState extends State<DashboardPage> {
               );
             },
             separatorBuilder: (BuildContext context, int index) => Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                )),
+              height: 1,
+              thickness: 1,
+              color: Colors.grey,
+            )),
       );
     } else {
       return Container(
@@ -273,16 +310,16 @@ class _DashboardState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     Widget loadingIndicator = isLoading
         ? new Container(
-            color: Colors.black.withOpacity(0.3),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: new Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: new Center(
-                child: new CircularProgressIndicator(),
-              ),
-            ),
-          )
+      color: Colors.black.withOpacity(0.3),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: new Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: new Center(
+          child: new CircularProgressIndicator(),
+        ),
+      ),
+    )
         : new Container(width: 0.0, height: 0.0);
     return MaterialApp(
       home: Scaffold(
@@ -331,12 +368,12 @@ class _DashboardState extends State<DashboardPage> {
                                     ),
                                     Padding(
                                       padding:
-                                          const EdgeInsets.only(bottom: 16),
+                                      const EdgeInsets.only(bottom: 16),
                                       child: Text(
                                         state.accInfo['currency']['symbol'] +
                                             ' ' +
                                             state.accInfo['status']
-                                                ['availableBalance'],
+                                            ['availableBalance'],
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: CommonTheme

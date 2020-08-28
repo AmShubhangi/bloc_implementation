@@ -28,17 +28,19 @@ class AuthenticationBloc
 
     if (event is AuthenticationLoggedIn) {
       yield AuthenticationInProgress();
-
-      yield AuthenticationSuccess(token: event.token);
-      storage.write(key: "authToken", value: event.token);
+      if(event.token != null && event.token != 'login'){
+        yield AuthenticationSuccess(token: event.token);
+      }
+//      yield AuthenticationSuccess(token: event.token);
+//      storage.write(key: "authToken", value: event.token);
     }
 
-//    if (event is AuthenticationLoggedOut) {
-//      print('AuthenticationBloc ==>> 7');
-//
-//      // yield AuthenticationInProgress();
+    if (event is AuthenticationLoggedOut) {
+      print('AuthenticationBloc ==>> 7');
+
+      // yield AuthenticationInProgress();
 //      await userRepository.deleteToken();
-//      yield AuthenticationFailure();
-//    }
+      yield AuthenticationFailure();
+    }
   }
 }
